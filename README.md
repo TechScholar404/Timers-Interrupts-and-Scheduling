@@ -8,7 +8,7 @@
 
 ---
 
-## 📝 Project Description
+Project Description
 
 This project demonstrates the implementation of hardware timer interrupts and task scheduling using the **RT-Spark Development Board**. Two hardware timers are configured to generate periodic interrupts at different intervals to control onboard LEDs and trigger specific tasks. Additionally, an external button interrupt is implemented to demonstrate event-triggered scheduling within a foreground/background system architecture.
 
@@ -27,7 +27,7 @@ This project demonstrates the implementation of hardware timer interrupts and ta
 
 ---
 
-## 🚀 Features
+ Features
 
 * **TIM2 Interrupt:** 1 Hz periodic interrupt configured with **High Priority**.
 * **TIM3 Interrupt:** 2 Hz periodic interrupt configured with **Medium Priority**.
@@ -37,7 +37,7 @@ This project demonstrates the implementation of hardware timer interrupts and ta
 
 ---
 
-## 📊 Timing Measurements & Analysis
+ Timing Measurements & Analysis
 
 ### Measurement Data
 
@@ -57,26 +57,8 @@ The following metrics were captured using a digital oscilloscope/logic analyzer 
 * **Efficiency:** Interrupt-based scheduling significantly reduces CPU overhead and provides drastically faster response times compared to traditional polling methods.
 * **Concurrency:** The foreground/background architecture successfully manages asynchronous external events (button presses) alongside deterministic background tasks without missing critical deadlines.
 
----
 
-## 🗺️ System Architecture & Sequence
-
-```
-[Hardware Timers / Button] 
-       │ (Interrupt Triggers)
-       ▼
- [Interrupt Service Routines (ISR)] ──(Sets Flags / Toggles LEDs)──► [Foreground]
-       │
-       ▼
- [Main Loop (Background Poll)] ───────(Executes Heavy Tasks)──────► [Background]
-
-```
-
-> 📌 **Note:** A detailed sequence diagram illustrating the exact timing interaction between `TIM2`, `TIM3`, the `PA0` button input, and the `main()` background loop is included in the accompanying project documentation folder.
-
----
-
-## 💻 Build & Deployment Instructions
+ Build & Deployment Instructions
 
 Follow these steps to set up, compile, and flash the project:
 
@@ -102,6 +84,11 @@ Follow these steps to set up, compile, and flash the project:
 5. **Verification**
 * Observe the **Red LED (PF11)** and **Blue LED (PF12)** blinking at their respective 1 Hz and 2 Hz rates.
 * Press the **User Button (PA0)** to verify the event-triggered interrupt behavior.
+
+* References
+Castor, P. R. P. (2025). Software Design Basics (Lecture 2). BCA143 Firmware Programming, MSU-IIT.
+
+STMicroelectronics. (2024). STM32F4 HAL Driver User Manual.
    The button interrupt demonstrates event-triggered scheduling with immediate response.
 References
 Castor, P. R. P. (2025). Software Design Basics (Lecture 2). BCA143 Firmware Programming, MSU-IIT.
