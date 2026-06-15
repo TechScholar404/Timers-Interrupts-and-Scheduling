@@ -8,88 +8,94 @@
 
 ---
 
-Project Description
+## Project Description
 
-This project demonstrates the implementation of hardware timer interrupts and task scheduling using the **RT-Spark Development Board**. Two hardware timers are configured to generate periodic interrupts at different intervals to control onboard LEDs and trigger specific tasks. Additionally, an external button interrupt is implemented to demonstrate event-triggered scheduling within a foreground/background system architecture.
+This project implements timer-based interrupts and a cyclic executive scheduler on the **STM32F407ZGT6** microcontroller utilizing the **RT-Thread RT-Spark Development Board**. The system is designed to handle periodic and asynchronous tasks efficiently using a foreground/background architecture.
 
 ---
 
-## 🛠️ Hardware Requirements
+##  Hardware Specifications
 
-* **Development Board:** RT-Spark Development Board
-* **Peripherals & Pins:**
+* **Development Board:** RT-Thread RT-Spark (STM32F407ZGT6)
+* **Peripherals & Pin Mapping:**
 * **Red LED:** `PF11`
 * **Blue LED:** `PF12`
-* **User Button:** `PA0` (External Interrupt)
-* **Debug Pin:** `PE0`
+* **User Button:** `PA0` (External Interrupt / EXTI)
+* **Debug Pin:** `PE0` (Used for timing analysis via Logic Analyzer/Oscilloscope)
 
 
 
 ---
 
- Features
+##  System Features
 
-* **TIM2 Interrupt:** 1 Hz periodic interrupt configured with **High Priority**.
-* **TIM3 Interrupt:** 2 Hz periodic interrupt configured with **Medium Priority**.
-* **External Interrupt (EXTI):** Event-triggered task mapped to the user button press.
-* **Architecture:** Foreground/Background system design for efficient task management.
-* **Performance Analysis:** Embedded toggle pins used for precise timing measurement.
+* **TIM2 Periodic Interrupt:** Configured at **1 Hz** with **High Priority**.
+* **TIM3 Periodic Interrupt:** Configured at **2 Hz** with **Medium Priority**.
+* **External Interrupt (EXTI):** Triggered asynchronously by the user button press (`PA0`).
+* **Architecture:** Foreground (ISRs for time-critical events) / Background (Main cyclic executive loop) system design.
+* **Analysis:** Real-time timing measurement using physical GPIO toggling on the debug pin.
 
 ---
 
- Timing Measurements & Analysis
+##  Timing Measurements
 
-### Measurement Data
+| Parameter | Description | Target Value / Interval | Measured Value |
+| --- | --- | --- | --- |
+| $T_{\text{Release}}$ | TIM2 Interrupt Period | 1.0 second | *[Insert Value]* |
+| $T_{\text{Latency}}$ | Interrupt Latency (Task A) | As quick as possible | *[Insert Value]* |
+| $T_{\text{ISR}}$ | Time spent inside TIM2 ISR | Minimal overhead | *[Insert Value]* |
+| $T_{\text{Task}}$ | Execution time of Task A | Process dependent | *[Insert Value]* |
+| $T_{\text{Response}}$ | Total Response Time (Task A) | $T_{\text{Latency}} + T_{\text{Task}}$ | *[Insert Value]* |
 
-The following metrics were captured using a digital oscilloscope/logic analyzer via the debug pin:
+---
 
-| Parameter | Description | Measured Value |
-| --- | --- | --- |
-| $T_{\text{Release}}$ | TIM2 Interrupt Period | 1.0 second |
-| $T_{\text{Latency}}$ | Interrupt Latency for Task A | 24.94 µs |
-| $T_{\text{ISR}}$ | Time spent inside TIM2 ISR | 4.31 µs |
-| $T_{\text{Task}}$ | Execution time of Task A | 50.00 ms |
-| $T_{\text{Response}}$ | Total Response Time for Task A | 50.02443 ms |
+## System Architecture
 
-### Key Findings
-
-* **Deterministic Scheduling:** The system utilizes dedicated hardware timer interrupts to execute periodic tasks, ensuring highly predictable execution windows.
-* **Efficiency:** Interrupt-based scheduling significantly reduces CPU overhead and provides drastically faster response times compared to traditional polling methods.
-* **Concurrency:** The foreground/background architecture successfully manages asynchronous external events (button presses) alongside deterministic background tasks without missing critical deadlines.
-
-
- Build & Deployment Instructions
-
-Follow these steps to set up, compile, and flash the project:
-
-1. **Open the Project**
-* Launch **STM32CubeIDE**.
-* Import or open the project workspace.
-
-
-2. **Build the Source Code**
-* Navigate to the top menu and select `Project` ➔ `Build All` (or press `Ctrl + B`).
-* Verify that the compilation finishes with `0 errors`.
+```
+       ┌────────────────────────────────────────────────────────┐
+       │                HARDWARE INTERRUPTS                     │
+       │  (TIM2 @ 1Hz)      (TIM3 @ 2Hz)     (Button Press PA0) │
+       └───────┬─────────────────┬────────────────────┬─────────┘
+               │                 │                    │
+               ▼                 ▼                    ▼
+       ┌────────────────────────────────────────────────────────┐
+       │           FOREGROUND: ISR Execution                    │
+       │   - Toggle Debug Pins     - Set Task Flags             │
+       └─────────────────────────┬──────────────────────────────┘
+                                 │
+                                 ▼ (Flags Passed)
+       ┌────────────────────────────────────────────────────────┐
+       │           BACKGROUND: Cyclic Main Loop                 │
+       │   - Poll Flags            - Execute Delayed Tasks      │
+       └────────────────────────────────────────────────────────┘
 
 
-3. **Hardware Connection**
-* Connect the **RT-Spark Development Board** to your PC using a USB cable.
-* Ensure the onboard debugger is recognized.
+##  Build Instructions
+
+1. **Open Workspace**
+* Launch **STM32CubeIDE** and import the project folder.
 
 
-4. **Flash and Run**
-* Click on `Run` ➔ `Run` (or `Debug` to step through the code).
+2. **Compile Project**
+* Navigate to `Project` ➔ `Build All` (or press `Ctrl + B`). Ensure there are `0 errors`.
 
 
-5. **Verification**
-* Observe the **Red LED (PF11)** and **Blue LED (PF12)** blinking at their respective 1 Hz and 2 Hz rates.
-* Press the **User Button (PA0)** to verify the event-triggered interrupt behavior.
+3. **Hardware Setup**
+* Connect the **RT-Thread RT-Spark Board** to your computer via USB.
 
-* References
-Castor, P. R. P. (2025). Software Design Basics (Lecture 2). BCA143 Firmware Programming, MSU-IIT.
 
-STMicroelectronics. (2024). STM32F4 HAL Driver User Manual.
-   The button interrupt demonstrates event-triggered scheduling with immediate response.
-References
-Castor, P. R. P. (2025). Software Design Basics (Lecture 2). BCA143 Firmware Programming, MSU-IIT.
-STMicroelectronics. (2024). STM32F4 HAL Driver User Manual.
+4. **Flash Microcontroller**
+* Click `Run` or `Debug` to upload the compiled binary file to the STM32F407ZGT6 target.
+
+
+5. **Observation & Verification**
+* Confirm the Red LED (`PF11`) blinks at **1 Hz** and the Blue LED (`PF12`) blinks at **2 Hz**.
+* Press the User Button (`PA0`) to verify the event-triggered external interrupt handler execution.
+
+
+
+---
+
+## 📚 References
+
+* Castor, P. R. P. (2026). *Software Design Basics (Lecture 2)*. BCA143 Firmware Programming, MSU-IIT.
