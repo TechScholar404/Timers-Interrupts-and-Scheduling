@@ -1,7 +1,3 @@
-Here is a clean, well-structured, and professionally formatted version of your **README.md** file for your laboratory activity. It uses clear typography, structured tables, and code blocks to make it highly readable for instructors or peer reviewers.
-
----
-
 # Laboratory Activity 1: Timers, Interrupts, and Task Scheduling
 
 **Course:** BCA143 Firmware Programming
